@@ -1,7 +1,13 @@
 import os
+import sys
 import json
+import traceback
 import pandas as pd
 from flask import Flask, render_template, request, jsonify, send_from_directory
+
+import matplotlib
+matplotlib.use('Agg')
+
 from src.data_preprocessing import load_raw_data, get_dataset_info
 from src.exploratory_analysis import compute_eda_statistics, generate_visualizations
 from src.train_model import train_and_save_model, MODEL_PATH
@@ -18,50 +24,66 @@ model_payload = None
 metrics = None
 predictor = None
 batch_samples = []
+init_error = None
 
 def initialize_system():
-    global df_raw, dataset_info, eda_stats, model_payload, metrics, predictor, batch_samples
+    global df_raw, dataset_info, eda_stats, model_payload, metrics, predictor, batch_samples, init_error
     if df_raw is not None:
         return
         
-    print("[+] Initializing Cyber Fraud Detection Engine...")
-    
-    # 1. Load dataset
-    df_raw = load_raw_data('data/credit_card_fraud_dataset.csv')
-    dataset_info = get_dataset_info(df_raw)
-    eda_stats = compute_eda_statistics(df_raw)
+    print("[+] Initializing Cyber Fraud Detection Engine...", flush=True)
+    try:
+        # 1. Load dataset
+        data_file = 'data/credit_card_fraud_dataset.csv'
+        if not os.path.exists(data_file) and os.path.exists('credit_card_fraud_dataset.csv'):
+            data_file = 'credit_card_fraud_dataset.csv'
 
-    # 2. Generate Matplotlib SOC Visualizations
-    generate_visualizations(df_raw, output_dir='outputs')
+        print(f"[+] Loading dataset from {data_file}...", flush=True)
+        df_raw = load_raw_data(data_file)
+        dataset_info = get_dataset_info(df_raw)
+        eda_stats = compute_eda_statistics(df_raw)
+        print(f"[+] Dataset loaded successfully: {len(df_raw)} records.", flush=True)
 
-    # 3. Train or load machine learning model
-    if not os.path.exists(MODEL_PATH):
-        print("[+] Model file missing. Training Random Forest model...")
-        model_payload = train_and_save_model('data/credit_card_fraud_dataset.csv', MODEL_PATH)
-    else:
-        print("[+] Loading existing Random Forest model artifact...")
-        import joblib
-        model_payload = joblib.load(MODEL_PATH)
+        # 2. Generate Matplotlib SOC Visualizations
+        print("[+] Generating Matplotlib Visualizations...", flush=True)
+        os.makedirs('outputs', exist_ok=True)
+        generate_visualizations(df_raw, output_dir='outputs')
 
-    # 4. Evaluate performance metrics
-    metrics = evaluate_performance(model_payload, output_dir='outputs')
+        # 3. Train or load machine learning model
+        if not os.path.exists(MODEL_PATH):
+            print("[+] Model file missing. Training Random Forest model...", flush=True)
+            model_payload = train_and_save_model(data_file, MODEL_PATH)
+        else:
+            print("[+] Loading existing Random Forest model artifact...", flush=True)
+            import joblib
+            model_payload = joblib.load(MODEL_PATH)
 
-    # 5. Initialize Predictor Engine
-    predictor = FraudPredictor(model_path=MODEL_PATH)
+        # 4. Evaluate performance metrics
+        print("[+] Evaluating model metrics...", flush=True)
+        metrics = evaluate_performance(model_payload, output_dir='outputs')
 
-    # 6. Generate batch samples (mix of fraud and genuine transactions for multi-tx table)
-    fraud_samples = df_raw[df_raw['IsFraud'] == 1].head(10)
-    genuine_samples = df_raw[df_raw['IsFraud'] == 0].head(15)
-    sample_df = pd.concat([fraud_samples, genuine_samples]).sample(frac=1, random_state=42)
-    batch_samples = predictor.predict_batch(sample_df)
+        # 5. Initialize Predictor Engine
+        print("[+] Initializing FraudPredictor engine...", flush=True)
+        predictor = FraudPredictor(model_path=MODEL_PATH)
 
-    print("[+] Initialization Complete! SOC Engine ready.")
+        # 6. Generate batch samples
+        fraud_samples = df_raw[df_raw['IsFraud'] == 1].head(10)
+        genuine_samples = df_raw[df_raw['IsFraud'] == 0].head(15)
+        sample_df = pd.concat([fraud_samples, genuine_samples]).sample(frac=1, random_state=42)
+        batch_samples = predictor.predict_batch(sample_df)
 
-# Initialize when imported by Gunicorn or run directly
+        print("[+] Initialization Complete! SOC Engine ready.", flush=True)
+    except Exception as e:
+        init_error = f"{str(e)}\n{traceback.format_exc()}"
+        print(f"[!] CRITICAL INITIALIZATION ERROR:\n{init_error}", file=sys.stderr, flush=True)
+
+# Run initialization at module import time
 initialize_system()
 
 @app.route('/')
 def index():
+    if init_error and (eda_stats is None or metrics is None):
+        return f"<h2>System Initialization Error</h2><pre>{init_error}</pre>", 500
     return render_template(
         'index.html',
         stats=eda_stats,
