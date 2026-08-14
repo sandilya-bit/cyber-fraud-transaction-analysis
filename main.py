@@ -21,6 +21,9 @@ batch_samples = []
 
 def initialize_system():
     global df_raw, dataset_info, eda_stats, model_payload, metrics, predictor, batch_samples
+    if df_raw is not None:
+        return
+        
     print("[+] Initializing Cyber Fraud Detection Engine...")
     
     # 1. Load dataset
@@ -53,6 +56,9 @@ def initialize_system():
     batch_samples = predictor.predict_batch(sample_df)
 
     print("[+] Initialization Complete! SOC Engine ready.")
+
+# Initialize when imported by Gunicorn or run directly
+initialize_system()
 
 @app.route('/')
 def index():
@@ -96,5 +102,4 @@ def api_metrics():
     return jsonify({'status': 'success', 'metrics': metrics})
 
 if __name__ == '__main__':
-    initialize_system()
     app.run(host='127.0.0.1', port=5000, debug=False)
