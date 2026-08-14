@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Fraud Data Transaction Analysis and Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="sidebar-header">
+                    <div class="brand-icon">🛡️</div>
+                    <div>
+                        <div class="brand-text-title">CYBER FRAUD <span>ANALYTICS</span></div>
+                        <div class="brand-text-sub">Transaction Security SOC</div>
+                    </div>
+                </div>
+                <ul class="nav-list">
+                    <li class="nav-item active"><a href="#dashboard"><span>📊</span> Dashboard</a></li>
+                    <li class="nav-item"><a href="#dataset-overview"><span>📁</span> Dataset Overview</a></li>
+                    <li class="nav-item"><a href="#visualizations"><span>📈</span> Visualizations</a></li>
+                    <li class="nav-item"><a href="#model-performance"><span>⚙️</span> Machine Learning</a></li>
+                    <li class="nav-item"><a href="#risk-analyzer"><span>🔗</span> Transaction Analyzer</a></li>
+                    <li class="nav-item"><a href="#batch-analysis"><span>📑</span> Recent Analysis</a></li>
+                    <li class="nav-item"><a href="#viva-faq"><span>ℹ️</span> About Project</a></li>
+                </ul>
+            </div>
+
+            <!-- SIDEBAR BOTTOM PANEL -->
+            <div class="sidebar-bottom">
+                <div class="status-header">System Status</div>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span>Model Online</span>
+                </div>
+                <div class="status-time" id="lastUpdatedTime">Last Updated: Today</div>
+                <button type="button" class="btn-refresh" onclick="location.reload()">
+                    <span>🔄</span> Refresh Data
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TOP HEADER -->
+            <header class="top-header" id="dashboard">
+                <div class="project-header-text">
+                    <h1>CYBER FRAUD DATA TRANSACTION ANALYSIS AND DETECTION SYSTEM</h1>
+                    <p>Transaction Intelligence • Fraud Detection • Risk Analysis</p>
+                </div>
+                <div class="header-clock">
+                    <span>📅</span>
+                    <span id="liveClock">24 May 2025 | 10:30:45 AM</span>
+                </div>
+            </header>
+
+            <!-- TOP 4 KPI CARDS -->
+            <section class="kpi-grid">
+                <div class="kpi-card total">
+                    <div class="kpi-top-row">
+                        <div class="kpi-label">TOTAL TRANSACTIONS</div>
+                        <div class="kpi-icon-badge total">💳</div>
+                    </div>
+                    <div class="kpi-value">{{ "{:,}".format(stats.total_transactions) }}</div>
+                    <div class="kpi-subtext">100% of Total Dataset</div>
+                </div>
+
+                <div class="kpi-card genuine">
+                    <div class="kpi-top-row">
+                        <div class="kpi-label">GENUINE TRANSACTIONS</div>
+                        <div class="kpi-icon-badge genuine">✓</div>
+                    </div>
+                    <div class="kpi-value genuine">{{ "{:,}".format(stats.genuine_transactions) }}</div>
+                    <div class="kpi-subtext"><span class="green">{{ stats.genuine_percentage }}%</span> of Total</div>
+                </div>
+
+                <div class="kpi-card fraud">
+                    <div class="kpi-top-row">
+                        <div class="kpi-label fraud">FRAUDULENT TRANSACTIONS</div>
+                        <div class="kpi-icon-badge fraud">⚠️</div>
+                    </div>
+                    <div class="kpi-value fraud">{{ "{:,}".format(stats.fraud_transactions) }}</div>
+                    <div class="kpi-subtext"><span class="red">{{ stats.fraud_percentage }}%</span> of Total</div>
+                </div>
+
+                <div class="kpi-card percentage">
+                    <div class="kpi-top-row">
+                        <div class="kpi-label">FRAUD PERCENTAGE</div>
+                        <div class="kpi-icon-badge percentage">📊</div>
+                    </div>
+                    <div class="kpi-value percentage">{{ stats.fraud_percentage }}%</div>
+                    <div class="kpi-subtext">Low but Critical Risk</div>
+                </div>
+            </section>
+
+            <!-- ROW 1 VISUALIZATIONS & ANALYZER -->
+            <section class="dashboard-grid-3col" id="visualizations">
+                <div class="soc-card">
+                    <div class="card-header-title">📊 FRAUD VS GENUINE TRANSACTIONS</div>
+                    <div class="chart-img-wrap">
+                        <img src="{{ url_for('static', filename='../outputs/fraud_distribution.png') }}" alt="Fraud Distribution Chart">
+                    </div>
+                </div>
+
+                <div class="soc-card">
+                    <div class="card-header-title">📈 TRANSACTION AMOUNT DISTRIBUTION</div>
+                    <div class="chart-img-wrap">
+                        <img src="{{ url_for('static', filename='../outputs/transaction_distribution.png') }}" alt="Amount Distribution Chart">
+                    </div>
+                </div>
+
+                <!-- TRANSACTION RISK ANALYZER FORM -->
+                <div class="soc-card" id="risk-analyzer">
+                    <div class="card-header-title cyan">🔍 TRANSACTION RISK ANALYZER</div>
+                    <div style="font-size:0.75rem; color:var(--text-secondary);">Enter Transaction Details to Evaluate Fraud Probability</div>
+                    
+                    <form id="analyzeForm" class="analyzer-form">
+                        <div class="form-field">
+                            <label for="txAmount">Amount ($)</label>
+                            <input type="number" id="txAmount" class="soc-input" step="0.01" value="4189.27" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="txMerchant">Merchant ID</label>
+                            <input type="number" id="txMerchant" class="soc-input" value="688" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="txType">Transaction Type</label>
+                            <select id="txType" class="soc-input">
+                                <option value="purchase">Purchase</option>
+                                <option value="refund" selected>Refund</option>
+                                <option value="transfer">Transfer</option>
+                                <option value="withdrawal">Withdrawal</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="txLocation">Location</label>
+                            <select id="txLocation" class="soc-input">
+                                <option value="San Antonio" selected>San Antonio</option>
+                                <option value="New York">New York</option>
+                                <option value="Los Angeles">Los Angeles</option>
+                                <option value="Chicago">Chicago</option>
+                                <option value="Houston">Houston</option>
+                                <option value="Phoenix">Phoenix</option>
+                                <option value="San Diego">San Diego</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="txHour">Hour (0-23)</label>
+                            <input type="number" id="txHour" class="soc-input" min="0" max="23" value="3" required>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="btn-analyze">
+                            <span>🔍</span> ANALYZE TRANSACTION
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ROW 2 VISUALIZATIONS & PREDICTION ALERT CARD -->
+            <section class="dashboard-grid-4col">
+                <div class="soc-card">
+                    <div class="card-header-title">📉 FRAUD TRANSACTION AMOUNT</div>
+                    <div class="chart-img-wrap">
+                        <img src="{{ url_for('static', filename='../outputs/fraud_amount_distribution.png') }}" alt="Fraud Amount Chart">
+                    </div>
+                </div>
+
+                <div class="soc-card">
+                    <div class="card-header-title">🔥 FEATURE CORRELATION HEATMAP</div>
+                    <div class="chart-img-wrap">
+                        <img src="{{ url_for('static', filename='../outputs/correlation.png') }}" alt="Correlation Matrix">
+                    </div>
+                </div>
+
+                <div class="soc-card">
+                    <div class="card-header-title">🍩 TRANSACTION RISK ANALYSIS</div>
+                    <div class="chart-img-wrap">
+                        <img src="{{ url_for('static', filename='../outputs/risk_donut.png') }}" alt="Risk Donut Chart">
+                    </div>
+                </div>
+
+                <!-- PREDICTION RESULT CARD -->
+                <div class="soc-card" style="justify-content: center;">
+                    <div class="card-header-title cyan">🎯 PREDICTION RESULT</div>
+                    <div id="predictionResultCard" class="prediction-alert-box">
+                        <div class="alert-top">
+                            <div class="shield-alert-icon">🛡️</div>
+                            <div>
+                                <div class="alert-info-title">PREDICTION</div>
+                                <div class="alert-pred-val" id="resPrediction">FRAUDULENT TRANSACTION</div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-metrics-grid">
+                            <div>
+                                <div class="alert-info-title">FRAUD PROBABILITY</div>
+                                <div class="metric-val-num" id="resProbability">87.42%</div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar-fill" id="resProgressBar" style="width: 87.42%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="alert-info-title">RISK LEVEL</div>
+                                <div class="risk-level-badge-box" id="resRiskLevel">HIGH</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-secondary); margin-top:4px;" id="resAlertMsg">
+                            Review this transaction carefully. Suspicious timing and amount pattern detected.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ROW 3 RECENT TRANSACTIONS TABLE & MODEL PERFORMANCE -->
+            <section class="dashboard-grid-3col" id="batch-analysis">
+                <div class="soc-card" style="grid-column: span 2;">
+                    <div class="card-header-title">📑 RECENT TRANSACTION ANALYSIS</div>
+                    <div class="table-responsive">
+                        <table class="soc-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Time (Hour)</th>
+                                    <th>Amount</th>
+                                    <th>Prediction</th>
+                                    <th>Fraud Probability</th>
+                                    <th>Risk Level</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tx in batch_samples[:6] %}
+                                <tr>
+                                    <td>#{{ tx.transaction_id }}</td>
+                                    <td>{{ tx.location }}</td>
+                                    <td style="font-weight:700;">{{ tx.amount }}</td>
+                                    <td style="font-weight:700; color:{{ tx.color_code }};">{{ tx.prediction }}</td>
+                                    <td style="font-weight:700;">{{ tx.fraud_probability }}%</td>
+                                    <td>
+                                        <span class="badge-risk {{ tx.risk_level.lower() }}">
+                                            {{ tx.risk_level }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn-view" onclick="alert('Transaction #{{ tx.transaction_id }} Details: Amount {{ tx.amount }}, Risk {{ tx.risk_level }}')">View</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- MODEL PERFORMANCE CARDS -->
+                <div class="soc-card" id="model-performance">
+                    <div class="card-header-title">⚙️ MODEL PERFORMANCE</div>
+                    <div class="perf-grid">
+                        <div class="perf-box">
+                            <div class="perf-box-name">Accuracy</div>
+                            <div class="perf-box-val accuracy">{{ metrics.accuracy }}%</div>
+                        </div>
+                        <div class="perf-box">
+                            <div class="perf-box-name">Precision</div>
+                            <div class="perf-box-val precision">{{ metrics.precision }}%</div>
+                        </div>
+                        <div class="perf-box">
+                            <div class="perf-box-name">Recall</div>
+                            <div class="perf-box-val recall">{{ metrics.recall }}%</div>
+                        </div>
+                        <div class="perf-box">
+                            <div class="perf-box-name">F1 Score</div>
+                            <div class="perf-box-val f1">{{ metrics.f1_score }}%</div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:6px;">
+                        <div class="chart-img-wrap">
+                            <img src="{{ url_for('static', filename='../outputs/confusion_matrix.png') }}" alt="Confusion Matrix">
+                        </div>
+                        <div class="chart-img-wrap">
+                            <img src="{{ url_for('static', filename='../outputs/accuracy_gauge.png') }}" alt="Accuracy Gauge">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIVA ABOUT SECTION -->
+            <section class="soc-card" id="viva-faq" style="margin-bottom:60px;">
+                <div class="card-header-title">ℹ️ ABOUT PROJECT & VIVA VOCE PRESENTATION</div>
+                <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.6;">
+                    <strong style="color:var(--text-primary);">Cyber Fraud Data Transaction Analysis and Detection System</strong> operates using a Random Forest Classifier trained on 100,000 transaction records. It preprocesses transaction features, handles missing values, engineers time-based domain attributes, and computes calibrated fraud probability. The system classifies risk into <span style="color:var(--success); font-weight:700;">LOW (0-30%)</span>, <span style="color:var(--warning); font-weight:700;">MEDIUM (30-70%)</span>, and <span style="color:var(--fraud); font-weight:700;">HIGH (70-100%)</span> categories.
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-nav">
+        <a href="#dashboard" class="mobile-nav-item active">
+            <span>📊</span>
+            <div>Dashboard</div>
+        </a>
+        <a href="#visualizations" class="mobile-nav-item">
+            <span>📈</span>
+            <div>Analysis</div>
+        </a>
+        <a href="#risk-analyzer" class="mobile-nav-item">
+            <span>🔗</span>
+            <div>Prediction</div>
+        </a>
+        <a href="#model-performance" class="mobile-nav-item">
+            <span>⚙️</span>
+            <div>Model</div>
+        </a>
+        <a href="#viva-faq" class="mobile-nav-item">
+            <span>ℹ️</span>
+            <div>About</div>
+        </a>
+    </nav>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
