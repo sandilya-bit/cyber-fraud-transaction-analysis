@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # headless safe
 import matplotlib.pyplot as plt
 from src.data_preprocessing import prepare_feature_matrix
 
