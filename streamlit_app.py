@@ -10,7 +10,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import joblib
 import time
-import hashlib
 import random
 from datetime import datetime
 
@@ -27,138 +26,7 @@ st.set_page_config(
 )
 
 # ══════════════════════════════════════════════════════════════════════════════
-# AUTHENTICATION SYSTEM
-# ══════════════════════════════════════════════════════════════════════════════
-
-USERS = {
-    "admin":   {"password": hashlib.sha256("admin@2024".encode()).hexdigest(),  "role": "Administrator", "name": "System Admin"},
-    "analyst": {"password": hashlib.sha256("fraud@123".encode()).hexdigest(),   "role": "Fraud Analyst",  "name": "Security Analyst"},
-    "viewer":  {"password": hashlib.sha256("view@2024".encode()).hexdigest(),   "role": "Viewer",         "name": "Report Viewer"},
-}
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
-def check_credentials(username, password):
-    u = username.strip().lower()
-    if u in USERS and USERS[u]["password"] == hash_password(password):
-        return True, USERS[u]["role"], USERS[u]["name"]
-    return False, None, None
-
-def render_login_page():
-    html("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
-        background: #020817 !important;
-        font-family: 'Inter', sans-serif !important;
-    }
-    [data-testid="stSidebar"] { display: none !important; }
-    .block-container { padding-top: 2rem !important; }
-
-    /* Inputs */
-    input, [data-baseweb="input"] > div {
-        background: #0F1F38 !important;
-        border: 1px solid rgba(51,65,85,0.8) !important;
-        border-radius: 10px !important;
-        color: #F8FAFC !important;
-    }
-    input:focus, [data-baseweb="input"] > div:focus-within {
-        border-color: #06B6D4 !important;
-        box-shadow: 0 0 0 2px rgba(6,182,212,0.2) !important;
-    }
-
-    /* Submit Button */
-    .stButton > button {
-        background: linear-gradient(135deg, #0E9BB5, #06B6D4) !important;
-        color: #020817 !important;
-        font-weight: 800 !important;
-        font-size: 0.92rem !important;
-        border: none !important;
-        border-radius: 10px !important;
-        padding: 0.75rem 1.4rem !important;
-        box-shadow: 0 4px 20px rgba(6,182,212,0.35) !important;
-    }
-    .stButton > button:hover {
-        filter: brightness(1.1) !important;
-        box-shadow: 0 6px 28px rgba(6,182,212,0.5) !important;
-    }
-    </style>
-    """)
-
-    col_left, col_center, col_right = st.columns([1, 1.4, 1])
-    with col_center:
-        html("""
-        <div style="background:rgba(15,23,42,0.95); border:1px solid rgba(51,65,85,0.8);
-                    border-radius:24px; padding:36px 32px 28px; margin-bottom:12px;
-                    box-shadow:0 0 0 1px rgba(6,182,212,0.08), 0 32px 64px rgba(0,0,0,0.5);">
-            <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
-                <div style="width:52px;height:52px;background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(6,182,212,0.05));
-                            border:1px solid rgba(6,182,212,0.4);border-radius:14px;display:flex;
-                            align-items:center;justify-content:center;font-size:1.6rem;
-                            box-shadow:0 0 24px rgba(6,182,212,0.15);">🛡️</div>
-                <div>
-                    <div style="font-size:1.05rem;font-weight:800;color:#F8FAFC;">CYBER FRAUD <span style="color:#06B6D4;">ANALYTICS</span></div>
-                    <div style="font-size:0.67rem;color:#94A3B8;text-transform:uppercase;letter-spacing:0.8px;">SOC Security Portal</div>
-                </div>
-            </div>
-
-            <div style="font-size:1.45rem;font-weight:800;color:#F8FAFC;margin-bottom:6px;letter-spacing:-0.02em;">
-                Secure Access</div>
-            <div style="font-size:0.82rem;color:#94A3B8;margin-bottom:20px;">
-                Enter your credentials to access the Transaction Intelligence SOC Dashboard</div>
-
-            <div style="background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);
-                        border-radius:10px;padding:12px 14px;">
-                <div style="font-size:0.68rem;color:#06B6D4;font-weight:700;text-transform:uppercase;margin-bottom:4px;">
-                    Demo Credentials</div>
-                <div style="font-size:0.76rem;color:#94A3B8;">
-                    <span style="color:#F8FAFC;font-weight:600;">admin</span> / admin@2024 &nbsp;|&nbsp;
-                    <span style="color:#F8FAFC;font-weight:600;">analyst</span> / fraud@123 &nbsp;|&nbsp;
-                    <span style="color:#F8FAFC;font-weight:600;">viewer</span> / view@2024
-                </div>
-            </div>
-        </div>
-        """)
-
-        with st.form("login_form"):
-            username = st.text_input("Username", placeholder="Enter username")
-            password = st.text_input("Password", type="password", placeholder="Enter password")
-            login_btn = st.form_submit_button("🔐  ACCESS DASHBOARD", use_container_width=True)
-
-            if login_btn:
-                if not username or not password:
-                    st.error("Please enter both username and password.")
-                else:
-                    success, role, name = check_credentials(username, password)
-                    if success:
-                        st.session_state.authenticated = True
-                        st.session_state.username = username.strip().lower()
-                        st.session_state.role = role
-                        st.session_state.name = name
-                        st.session_state.login_time = datetime.now().strftime("%d %b %Y • %I:%M %p")
-                        st.rerun()
-                    else:
-                        st.error("❌ Invalid credentials. Please try again.")
-
-        html("""
-        <div style="text-align:center;margin-top:20px;">
-            <span style="font-size:0.72rem;color:#475569;">
-                🔒 256-bit SHA encrypted authentication &nbsp;|&nbsp; Cyber Fraud Analytics v2.0
-            </span>
-        </div>
-        """)
-
-# Check authentication
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if not st.session_state.authenticated:
-    render_login_page()
-    st.stop()
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PREMIUM GLOBAL CSS (applied after login)
+# PREMIUM GLOBAL CSS
 # ══════════════════════════════════════════════════════════════════════════════
 html("""
 <style>
@@ -356,9 +224,9 @@ def load_everything():
 
 # ── Sidebar Content ────────────────────────────────────────────────────────────
 with st.sidebar:
-    html(f"""
+    html("""
     <div style="padding:4px 0 20px;border-bottom:1px solid rgba(51,65,85,0.4);margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:13px;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:14px;">
             <div style="width:44px;height:44px;background:linear-gradient(135deg,rgba(6,182,212,0.25),rgba(6,182,212,0.06));
                         border:1px solid rgba(6,182,212,0.4);border-radius:12px;display:flex;
                         align-items:center;justify-content:center;font-size:1.35rem;
@@ -368,14 +236,14 @@ with st.sidebar:
                 <div style="font-size:0.62rem;color:#64748B;text-transform:uppercase;letter-spacing:0.7px;">v2.0 • SOC Dashboard</div>
             </div>
         </div>
-        <div style="background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.03));
-                    border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;">
+        <div style="background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(6,182,212,0.03));
+                    border:1px solid rgba(6,182,212,0.25);border-radius:12px;padding:10px 14px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
                 <span style="width:7px;height:7px;background:#10B981;border-radius:50%;
                              box-shadow:0 0 8px #10B981;display:inline-block;"></span>
-                <span style="font-size:0.78rem;font-weight:700;color:#F8FAFC;">{st.session_state.name}</span>
+                <span style="font-size:0.78rem;font-weight:700;color:#F8FAFC;">SOC Live Portal</span>
             </div>
-            <div style="font-size:0.68rem;color:#64748B;">{st.session_state.role} &nbsp;•&nbsp; {st.session_state.login_time}</div>
+            <div style="font-size:0.68rem;color:#64748B;">Dataset: 100,000 Transactions</div>
         </div>
     </div>
     """)
@@ -399,14 +267,9 @@ with st.sidebar:
                          box-shadow:0 0 8px #10B981;display:inline-block;"></span>
             Model Online
         </div>
-        <div style="font-size:0.67rem;color:#64748B;">Random Forest Classifier<br>Dataset: 100,000 records</div>
+        <div style="font-size:0.67rem;color:#64748B;">Random Forest Classifier<br>100k records trained</div>
     </div>
     """)
-
-    if st.button("🚪  Sign Out", use_container_width=True):
-        for key in ["authenticated","username","role","name","login_time"]:
-            st.session_state.pop(key, None)
-        st.rerun()
 
 # ── Load Data ───────────────────────────────────────────────────────────────────
 with st.spinner("🔄  Loading SOC Engine..."):
@@ -822,7 +685,6 @@ elif page == "📥  Intelligence Report":
 ║                    FRAUD INTELLIGENCE REPORT — v2.0                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-Generated By   : {st.session_state.name} ({st.session_state.role})
 Report Date    : {now_str}
 Dataset        : credit_card_fraud_dataset.csv
 Model          : RandomForestClassifier (n_estimators=30, balanced)
