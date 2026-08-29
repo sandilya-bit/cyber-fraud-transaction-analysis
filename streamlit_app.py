@@ -1,6 +1,7 @@
 import os
 os.environ['MPLBACKEND'] = 'Agg'
 
+import textwrap
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,6 +13,10 @@ import time
 import hashlib
 import random
 from datetime import datetime
+
+# Helper to render clean HTML without markdown indentation bugs
+def html(raw_html):
+    st.markdown(textwrap.dedent(raw_html).strip(), unsafe_allow_html=True)
 
 # ── Page Config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -41,8 +46,7 @@ def check_credentials(username, password):
     return False, None, None
 
 def render_login_page():
-    # Full-page premium login screen
-    st.markdown("""
+    html("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
@@ -50,104 +54,74 @@ def render_login_page():
         font-family: 'Inter', sans-serif !important;
     }
     [data-testid="stSidebar"] { display: none !important; }
-    .block-container { padding: 0 !important; max-width: 100% !important; }
+    .block-container { padding-top: 2rem !important; }
 
-    .login-bg {
-        min-height: 100vh;
-        background: radial-gradient(ellipse at 20% 50%, rgba(6,182,212,0.08) 0%, transparent 50%),
-                    radial-gradient(ellipse at 80% 50%, rgba(99,102,241,0.06) 0%, transparent 50%),
-                    #020817;
-        display: flex; align-items: center; justify-content: center;
-        padding: 40px 20px;
+    /* Inputs */
+    input, [data-baseweb="input"] > div {
+        background: #0F1F38 !important;
+        border: 1px solid rgba(51,65,85,0.8) !important;
+        border-radius: 10px !important;
+        color: #F8FAFC !important;
     }
-    .login-card {
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(51, 65, 85, 0.8);
-        border-radius: 24px;
-        padding: 48px 44px;
-        width: 100%;
-        max-width: 440px;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 0 0 1px rgba(6,182,212,0.08),
-                    0 32px 64px rgba(0,0,0,0.5),
-                    0 0 120px rgba(6,182,212,0.04);
+    input:focus, [data-baseweb="input"] > div:focus-within {
+        border-color: #06B6D4 !important;
+        box-shadow: 0 0 0 2px rgba(6,182,212,0.2) !important;
     }
-    .login-brand {
-        display: flex; align-items: center; gap: 14px; margin-bottom: 32px;
+
+    /* Submit Button */
+    .stButton > button {
+        background: linear-gradient(135deg, #0E9BB5, #06B6D4) !important;
+        color: #020817 !important;
+        font-weight: 800 !important;
+        font-size: 0.92rem !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1.4rem !important;
+        box-shadow: 0 4px 20px rgba(6,182,212,0.35) !important;
     }
-    .login-icon {
-        width: 52px; height: 52px;
-        background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(6,182,212,0.05));
-        border: 1px solid rgba(6,182,212,0.4);
-        border-radius: 14px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.6rem;
-        box-shadow: 0 0 24px rgba(6,182,212,0.15);
+    .stButton > button:hover {
+        filter: brightness(1.1) !important;
+        box-shadow: 0 6px 28px rgba(6,182,212,0.5) !important;
     }
-    .login-title-main {
-        font-size: 1.05rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.01em;
-    }
-    .login-title-main span { color: #06B6D4; }
-    .login-title-sub {
-        font-size: 0.68rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.8px;
-    }
-    .login-heading {
-        font-size: 1.55rem; font-weight: 800; color: #F8FAFC;
-        margin-bottom: 6px; letter-spacing: -0.02em;
-    }
-    .login-subheading {
-        font-size: 0.85rem; color: #94A3B8; margin-bottom: 28px; line-height: 1.5;
-    }
-    .login-demo-box {
-        background: rgba(6,182,212,0.07);
-        border: 1px solid rgba(6,182,212,0.2);
-        border-radius: 10px; padding: 12px 16px; margin-bottom: 24px;
-    }
-    .login-demo-title { font-size: 0.72rem; color: #06B6D4; font-weight:700; text-transform:uppercase; margin-bottom:6px; }
-    .login-demo-row { font-size: 0.78rem; color: #94A3B8; display: flex; gap: 12px; margin-top:3px; }
-    .login-demo-key { color: #F8FAFC; font-weight: 600; }
     </style>
-    """, unsafe_allow_html=True)
+    """)
 
     col_left, col_center, col_right = st.columns([1, 1.4, 1])
     with col_center:
-        st.markdown("""
-        <div style="height:32px"></div>
+        html("""
         <div style="background:rgba(15,23,42,0.95); border:1px solid rgba(51,65,85,0.8);
-                    border-radius:24px; padding:48px 40px;
+                    border-radius:24px; padding:36px 32px 28px; margin-bottom:12px;
                     box-shadow:0 0 0 1px rgba(6,182,212,0.08), 0 32px 64px rgba(0,0,0,0.5);">
-
-            <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px;">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
                 <div style="width:52px;height:52px;background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(6,182,212,0.05));
                             border:1px solid rgba(6,182,212,0.4);border-radius:14px;display:flex;
                             align-items:center;justify-content:center;font-size:1.6rem;
                             box-shadow:0 0 24px rgba(6,182,212,0.15);">🛡️</div>
                 <div>
-                    <div style="font-size:1.0rem;font-weight:800;color:#F8FAFC;">CYBER FRAUD <span style="color:#06B6D4;">ANALYTICS</span></div>
+                    <div style="font-size:1.05rem;font-weight:800;color:#F8FAFC;">CYBER FRAUD <span style="color:#06B6D4;">ANALYTICS</span></div>
                     <div style="font-size:0.67rem;color:#94A3B8;text-transform:uppercase;letter-spacing:0.8px;">SOC Security Portal</div>
                 </div>
             </div>
 
-            <div style="font-size:1.5rem;font-weight:800;color:#F8FAFC;margin-bottom:6px;letter-spacing:-0.02em;">
+            <div style="font-size:1.45rem;font-weight:800;color:#F8FAFC;margin-bottom:6px;letter-spacing:-0.02em;">
                 Secure Access</div>
-            <div style="font-size:0.82rem;color:#94A3B8;margin-bottom:24px;">
+            <div style="font-size:0.82rem;color:#94A3B8;margin-bottom:20px;">
                 Enter your credentials to access the Transaction Intelligence SOC Dashboard</div>
 
             <div style="background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);
-                        border-radius:10px;padding:12px 14px;margin-bottom:24px;">
-                <div style="font-size:0.68rem;color:#06B6D4;font-weight:700;text-transform:uppercase;margin-bottom:6px;">
+                        border-radius:10px;padding:12px 14px;">
+                <div style="font-size:0.68rem;color:#06B6D4;font-weight:700;text-transform:uppercase;margin-bottom:4px;">
                     Demo Credentials</div>
-                <div style="font-size:0.76rem;color:#94A3B8;margin-top:3px;">
+                <div style="font-size:0.76rem;color:#94A3B8;">
                     <span style="color:#F8FAFC;font-weight:600;">admin</span> / admin@2024 &nbsp;|&nbsp;
                     <span style="color:#F8FAFC;font-weight:600;">analyst</span> / fraud@123 &nbsp;|&nbsp;
                     <span style="color:#F8FAFC;font-weight:600;">viewer</span> / view@2024
                 </div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
         with st.form("login_form"):
-            st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
             username = st.text_input("Username", placeholder="Enter username")
             password = st.text_input("Password", type="password", placeholder="Enter password")
             login_btn = st.form_submit_button("🔐  ACCESS DASHBOARD", use_container_width=True)
@@ -167,14 +141,13 @@ def render_login_page():
                     else:
                         st.error("❌ Invalid credentials. Please try again.")
 
-        st.markdown("""
-        <div style="text-align:center;margin-top:24px;">
+        html("""
+        <div style="text-align:center;margin-top:20px;">
             <span style="font-size:0.72rem;color:#475569;">
                 🔒 256-bit SHA encrypted authentication &nbsp;|&nbsp; Cyber Fraud Analytics v2.0
             </span>
         </div>
-        """, unsafe_allow_html=True)
-
+        """)
 
 # Check authentication
 if "authenticated" not in st.session_state:
@@ -185,13 +158,12 @@ if not st.session_state.authenticated:
     st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PREMIUM GLOBAL CSS (only after login)
+# PREMIUM GLOBAL CSS (applied after login)
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown("""
+html("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* ── Root Theme ── */
 :root {
     --bg:       #020817;
     --card:     #0A1628;
@@ -213,11 +185,10 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
     color: var(--t1) !important;
 }
 
-/* Remove extra padding */
 .block-container { padding-top: 1.2rem !important; padding-bottom: 3rem !important; }
 .stMainBlockContainer { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
 
-/* ── Sidebar Premium ── */
+/* Sidebar */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0A1628 0%, #050D1A 100%) !important;
     border-right: 1px solid rgba(6,182,212,0.12) !important;
@@ -225,7 +196,7 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
 [data-testid="stSidebar"] * { color: var(--t2) !important; }
 [data-testid="stSidebar"] strong, [data-testid="stSidebar"] h3 { color: var(--t1) !important; }
 
-/* ── Radio Nav Buttons ── */
+/* Radio Buttons Navigation */
 [data-testid="stSidebar"] [data-testid="stRadio"] label {
     background: transparent !important;
     border-radius: 10px !important;
@@ -235,9 +206,9 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
     align-items: center !important;
     font-size: 0.86rem !important;
     font-weight: 500 !important;
-    transition: all 0.2s ease !important;
     cursor: pointer !important;
     color: var(--t2) !important;
+    transition: all 0.2s ease !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
     background: rgba(6,182,212,0.08) !important;
@@ -251,7 +222,7 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
     border-left: 3px solid var(--accent) !important;
 }
 
-/* ── Input Fields ── */
+/* Input Fields */
 input, select, textarea,
 [data-baseweb="input"] > div,
 [data-baseweb="select"] > div:first-child {
@@ -259,24 +230,13 @@ input, select, textarea,
     border: 1px solid rgba(51,65,85,0.8) !important;
     border-radius: 10px !important;
     color: var(--t1) !important;
-    font-family: 'Inter', sans-serif !important;
 }
 input:focus, [data-baseweb="input"] > div:focus-within {
     border-color: var(--accent) !important;
     box-shadow: 0 0 0 3px rgba(6,182,212,0.1) !important;
 }
-[data-baseweb="input"] > div { padding: 2px 4px !important; }
 
-/* ── Number Input ── */
-[data-testid="stNumberInput"] input { padding: 8px 12px !important; }
-
-/* ── Slider ── */
-[data-testid="stSlider"] .st-emotion-cache-1b0h9lx,
-.stSlider [role="slider"] {
-    background: var(--accent) !important;
-}
-
-/* ── Buttons ── */
+/* Buttons */
 .stButton > button {
     background: linear-gradient(135deg, #0E9BB5, #06B6D4) !important;
     color: #020817 !important;
@@ -285,113 +245,50 @@ input:focus, [data-baseweb="input"] > div:focus-within {
     border: none !important;
     border-radius: 10px !important;
     padding: 0.65rem 1.4rem !important;
-    letter-spacing: 0.3px !important;
     box-shadow: 0 4px 16px rgba(6,182,212,0.3) !important;
-    transition: all 0.2s ease !important;
 }
 .stButton > button:hover {
     box-shadow: 0 6px 24px rgba(6,182,212,0.45) !important;
-    transform: translateY(-1px) !important;
     filter: brightness(1.08) !important;
 }
-.stButton > button:active { transform: translateY(0px) !important; }
 
-/* ── Metrics ── */
+/* Metrics */
 [data-testid="stMetric"] {
     background: linear-gradient(135deg, rgba(10,22,40,0.9), rgba(5,13,26,0.95));
     border: 1px solid rgba(51,65,85,0.6);
     border-radius: 16px;
     padding: 18px 20px !important;
     box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-    transition: border-color 0.2s ease, transform 0.2s ease;
-}
-[data-testid="stMetric"]:hover {
-    border-color: rgba(6,182,212,0.3) !important;
-    transform: translateY(-2px);
 }
 [data-testid="stMetricValue"] {
     color: var(--t1) !important;
     font-weight: 800 !important;
     font-size: 1.6rem !important;
-    letter-spacing: -0.02em !important;
 }
 [data-testid="stMetricLabel"] {
     color: var(--t2) !important;
     font-size: 0.74rem !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
     font-weight: 600 !important;
 }
 
-/* ── DataFrames ── */
+/* DataFrames */
 [data-testid="stDataFrame"] {
     border: 1px solid rgba(51,65,85,0.5) !important;
     border-radius: 12px !important;
-    overflow: hidden !important;
 }
-[data-testid="stDataFrame"] th {
-    background: rgba(10,22,40,0.95) !important;
-    color: var(--t2) !important;
-}
-[data-testid="stDataFrame"] td { background: rgba(5,13,26,0.9) !important; }
-
-/* ── Tabs ── */
-[data-baseweb="tab-list"] { gap: 6px !important; background: transparent !important; border-bottom: 1px solid rgba(51,65,85,0.4) !important; }
-[data-baseweb="tab"] {
-    background: transparent !important;
-    border-radius: 8px 8px 0 0 !important;
-    color: var(--t2) !important;
-    font-weight: 600 !important;
-    font-size: 0.82rem !important;
-    padding: 8px 16px !important;
-    border-bottom: 2px solid transparent !important;
-}
-[aria-selected="true"][data-baseweb="tab"] {
-    color: var(--accent) !important;
-    border-bottom: 2px solid var(--accent) !important;
-    background: rgba(6,182,212,0.06) !important;
-}
-
-/* ── Success / Error ── */
-[data-testid="stAlert"] { border-radius: 12px !important; }
-
-/* ── Progress ── */
-[data-testid="stProgressBar"] > div > div {
-    background: linear-gradient(90deg, var(--accent), #0EA5E9) !important;
-}
-
-/* ── Select Box ── */
-[data-baseweb="select"] [data-testid="stSelectbox"] { color: var(--t1) !important; }
-
-/* ── Spinner ── */
-.stSpinner > div { border-top-color: var(--accent) !important; }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: rgba(51,65,85,0.8); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-/* ── Divider ── */
 hr { border-color: rgba(51,65,85,0.4) !important; }
-
 </style>
-""", unsafe_allow_html=True)
+""")
 
-
-# ── Premium Component Helpers ───────────────────────────────────────────────────
-def kpi_card(label, value, color, icon, subtext="", gradient_from=""):
-    gf = gradient_from or color
+# ── Helper Components ──────────────────────────────────────────────────────────
+def kpi_card(label, value, color, icon, subtext=""):
     return f"""
     <div style="background:linear-gradient(145deg, rgba(10,22,40,0.95) 0%, rgba(5,13,26,0.98) 100%);
                 border:1px solid rgba(51,65,85,0.5); border-radius:18px; padding:22px 22px 18px;
                 border-bottom:3px solid {color};
-                box-shadow:0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.02);
-                transition:all 0.25s ease; position:relative; overflow:hidden;">
-        <div style="position:absolute;top:-30px;right:-30px;width:100px;height:100px;
-                    background:radial-gradient(circle, {color}18 0%, transparent 70%);
-                    border-radius:50%;pointer-events:none;"></div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;">
+                box-shadow:0 8px 32px rgba(0,0,0,0.35); position:relative; overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div style="font-size:0.68rem;font-weight:700;color:#64748B;text-transform:uppercase;
                         letter-spacing:0.8px;">{label}</div>
             <div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
@@ -400,35 +297,27 @@ def kpi_card(label, value, color, icon, subtext="", gradient_from=""):
                         border:1px solid {color}35;">{icon}</div>
         </div>
         <div style="font-size:2.0rem;font-weight:900;color:{color};margin:10px 0 5px;
-                    letter-spacing:-0.03em;text-shadow:0 0 40px {color}40;">{value}</div>
+                    letter-spacing:-0.03em;">{value}</div>
         <div style="font-size:0.72rem;color:#64748B;font-weight:500;">{subtext}</div>
     </div>"""
 
-
 def section_header(title, subtitle=""):
-    sub_html = f"<div style='font-size:0.77rem;color:#64748B;margin-top:3px;font-weight:400;'>{subtitle}</div>" if subtitle else ""
-    st.markdown(f"""
+    sub_html = f"<div style='font-size:0.77rem;color:#64748B;margin-top:3px;'>{subtitle}</div>" if subtitle else ""
+    html(f"""
     <div style="margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid rgba(51,65,85,0.35);">
         <div style="font-size:1.0rem;font-weight:800;color:#F8FAFC;letter-spacing:-0.01em;">{title}</div>
         {sub_html}
-    </div>""", unsafe_allow_html=True)
-
-
-def accent_badge(text, color="#06B6D4"):
-    return f"""<span style="background:{color}18;border:1px solid {color}35;color:{color};
-                padding:2px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;">{text}</span>"""
-
+    </div>""")
 
 def metric_pill(label, value, color="#06B6D4"):
     return f"""
     <div style="background:rgba(10,22,40,0.9);border:1px solid rgba(51,65,85,0.5);border-radius:12px;
                 padding:14px 18px;text-align:center;">
         <div style="font-size:0.67rem;color:#64748B;text-transform:uppercase;font-weight:700;letter-spacing:0.5px;">{label}</div>
-        <div style="font-size:1.4rem;font-weight:900;color:{color};margin-top:5px;letter-spacing:-0.02em;">{value}</div>
+        <div style="font-size:1.4rem;font-weight:900;color:{color};margin-top:5px;">{value}</div>
     </div>"""
 
-
-# ── Data & Model (cached) ───────────────────────────────────────────────────────
+# ── Load Data (Cached) ──────────────────────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
 def load_everything():
     from src.data_preprocessing import load_raw_data, get_dataset_info
@@ -465,13 +354,11 @@ def load_everything():
 
     return df, dataset_info, eda_stats, metrics, predictor, batch_samples
 
-
-# ── Sidebar ─────────────────────────────────────────────────────────────────────
+# ── Sidebar Content ────────────────────────────────────────────────────────────
 with st.sidebar:
-    # Brand
-    st.markdown(f"""
-    <div style="padding:4px 0 24px;border-bottom:1px solid rgba(51,65,85,0.4);margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:13px;margin-bottom:20px;">
+    html(f"""
+    <div style="padding:4px 0 20px;border-bottom:1px solid rgba(51,65,85,0.4);margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:13px;margin-bottom:18px;">
             <div style="width:44px;height:44px;background:linear-gradient(135deg,rgba(6,182,212,0.25),rgba(6,182,212,0.06));
                         border:1px solid rgba(6,182,212,0.4);border-radius:12px;display:flex;
                         align-items:center;justify-content:center;font-size:1.35rem;
@@ -482,8 +369,8 @@ with st.sidebar:
             </div>
         </div>
         <div style="background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(16,185,129,0.03));
-                    border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:11px 14px;">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                    border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:10px 14px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
                 <span style="width:7px;height:7px;background:#10B981;border-radius:50%;
                              box-shadow:0 0 8px #10B981;display:inline-block;"></span>
                 <span style="font-size:0.78rem;font-weight:700;color:#F8FAFC;">{st.session_state.name}</span>
@@ -491,7 +378,7 @@ with st.sidebar:
             <div style="font-size:0.68rem;color:#64748B;">{st.session_state.role} &nbsp;•&nbsp; {st.session_state.login_time}</div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     page = st.radio(
         "Navigate",
@@ -502,39 +389,36 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("""
+    html("""
     <div style="background:rgba(10,22,40,0.8);border:1px solid rgba(51,65,85,0.4);
-                border-radius:12px;padding:13px 15px;margin-bottom:12px;">
+                border-radius:12px;padding:12px 14px;margin-bottom:12px;">
         <div style="font-size:0.65rem;color:#64748B;text-transform:uppercase;font-weight:700;
-                    letter-spacing:0.7px;margin-bottom:8px;">System Status</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:600;color:#F8FAFC;margin-bottom:4px;">
+                    letter-spacing:0.7px;margin-bottom:6px;">System Status</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:600;color:#F8FAFC;margin-bottom:3px;">
             <span style="width:7px;height:7px;background:#10B981;border-radius:50%;
                          box-shadow:0 0 8px #10B981;display:inline-block;"></span>
             Model Online
         </div>
         <div style="font-size:0.67rem;color:#64748B;">Random Forest Classifier<br>Dataset: 100,000 records</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     if st.button("🚪  Sign Out", use_container_width=True):
         for key in ["authenticated","username","role","name","login_time"]:
             st.session_state.pop(key, None)
         st.rerun()
 
-
 # ── Load Data ───────────────────────────────────────────────────────────────────
 with st.spinner("🔄  Loading SOC Engine..."):
     df, dataset_info, eda_stats, metrics, predictor, batch_samples = load_everything()
-
 
 # ══════════════════════════════════════════════════════════════════════
 # PAGE: DASHBOARD
 # ══════════════════════════════════════════════════════════════════════
 if page == "📊  Dashboard":
-    # Header
-    st.markdown(f"""
+    html("""
     <div style="display:flex;justify-content:space-between;align-items:flex-start;
-                margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(51,65,85,0.35);">
+                margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid rgba(51,65,85,0.35);">
         <div>
             <div style="font-size:1.45rem;font-weight:900;color:#F8FAFC;letter-spacing:-0.02em;margin-bottom:4px;">
                 CYBER FRAUD DATA TRANSACTION ANALYSIS</div>
@@ -548,30 +432,30 @@ if page == "📊  Dashboard":
             <span style="font-size:0.78rem;color:#94A3B8;font-weight:600;">SOC Engine Active</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     # KPI Cards
     k1, k2, k3, k4 = st.columns(4)
-    with k1: st.markdown(kpi_card("Total Transactions", f"{eda_stats['total_transactions']:,}", "#06B6D4", "💳", "100% of Dataset"), unsafe_allow_html=True)
-    with k2: st.markdown(kpi_card("Genuine Transactions", f"{eda_stats['genuine_transactions']:,}", "#10B981", "✓", f"{eda_stats['genuine_percentage']}% Verified Safe"), unsafe_allow_html=True)
-    with k3: st.markdown(kpi_card("Fraudulent Transactions", f"{eda_stats['fraud_transactions']:,}", "#EF4444", "⚠️", f"{eda_stats['fraud_percentage']}% of Total"), unsafe_allow_html=True)
-    with k4: st.markdown(kpi_card("Fraud Rate", f"{eda_stats['fraud_percentage']}%", "#F59E0B", "📊", "Low but Critical"), unsafe_allow_html=True)
+    with k1: html(kpi_card("Total Transactions", f"{eda_stats['total_transactions']:,}", "#06B6D4", "💳", "100% of Dataset"))
+    with k2: html(kpi_card("Genuine Transactions", f"{eda_stats['genuine_transactions']:,}", "#10B981", "✓", f"{eda_stats['genuine_percentage']}% Verified Safe"))
+    with k3: html(kpi_card("Fraudulent Transactions", f"{eda_stats['fraud_transactions']:,}", "#EF4444", "⚠️", f"{eda_stats['fraud_percentage']}% of Total"))
+    with k4: html(kpi_card("Fraud Rate", f"{eda_stats['fraud_percentage']}%", "#F59E0B", "📊", "Low but Critical"))
 
-    st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
     # Charts row
-    section_header("📊 Key Insights", "Auto-generated Matplotlib SOC Visualizations from live dataset")
+    section_header("📊 Key Insights", "Visualizations generated directly from the 100k transaction dataset")
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>Fraud vs Genuine Distribution</div>", unsafe_allow_html=True)
+        html("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>Fraud vs Genuine Distribution</div>")
         st.image("outputs/fraud_distribution.png", use_container_width=True)
     with c2:
-        st.markdown("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>Transaction Amount Histogram</div>", unsafe_allow_html=True)
+        html("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>Transaction Amount Histogram</div>")
         st.image("outputs/transaction_distribution.png", use_container_width=True)
 
     c3, c4 = st.columns(2)
     with c3:
-        st.markdown("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>Risk Distribution (Donut)</div>", unsafe_allow_html=True)
+        html("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>Risk Distribution (Donut)</div>")
         st.image("outputs/risk_donut.png", use_container_width=True)
     with c4:
         section_header("⚙️ Model Performance Snapshot")
@@ -581,7 +465,6 @@ if page == "📊  Dashboard":
         pm3, pm4 = st.columns(2)
         pm3.metric("Recall",    f"{metrics['recall']}%")
         pm4.metric("F1 Score",  f"{metrics['f1_score']}%")
-
 
 # ══════════════════════════════════════════════════════════════════════
 # PAGE: DATASET OVERVIEW
@@ -614,7 +497,6 @@ elif page == "📁  Dataset Overview":
     }
     st.dataframe(pd.DataFrame(summary), use_container_width=True, hide_index=True)
 
-
 # ══════════════════════════════════════════════════════════════════════
 # PAGE: VISUALIZATIONS
 # ══════════════════════════════════════════════════════════════════════
@@ -633,9 +515,8 @@ elif page == "📈  Visualizations":
             if i + j < len(charts):
                 fname, title = charts[i+j]
                 with col:
-                    st.markdown(f"<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>{title}</div>", unsafe_allow_html=True)
+                    html(f"<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;'>{title}</div>")
                     st.image(f"outputs/{fname}", use_container_width=True)
-
 
 # ══════════════════════════════════════════════════════════════════════
 # PAGE: MODEL PERFORMANCE
@@ -655,7 +536,6 @@ elif page == "⚙️  Model Performance":
     with ci1: st.image("outputs/confusion_matrix.png", use_container_width=True)
     with ci2: st.image("outputs/accuracy_gauge.png",   use_container_width=True)
 
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
     cm = metrics['confusion_matrix']
     section_header("Confusion Matrix Breakdown")
     cm_df = pd.DataFrame({
@@ -665,15 +545,14 @@ elif page == "⚙️  Model Performance":
     })
     st.dataframe(cm_df, use_container_width=True, hide_index=True)
 
-    st.markdown(f"""
+    html(f"""
     <div style="background:linear-gradient(135deg,rgba(6,182,212,0.07),rgba(6,182,212,0.02));
                 border:1px solid rgba(6,182,212,0.2);border-radius:14px;padding:18px 22px;margin-top:16px;">
         <div style="color:#06B6D4;font-size:0.78rem;font-weight:700;text-transform:uppercase;
                     letter-spacing:0.5px;margin-bottom:8px;">💡 Why Recall & Precision Matter</div>
         <p style="color:#94A3B8;font-size:0.83rem;line-height:1.65;margin:0;">{metrics['explanation']}</p>
     </div>
-    """, unsafe_allow_html=True)
-
+    """)
 
 # ══════════════════════════════════════════════════════════════════════
 # PAGE: TRANSACTION ANALYZER
@@ -684,7 +563,7 @@ elif page == "🔍  Transaction Analyzer":
     col_form, col_result = st.columns([1, 1])
 
     with col_form:
-        st.markdown("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;'>Transaction Feature Input</div>", unsafe_allow_html=True)
+        html("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;'>Transaction Feature Input</div>")
         with st.form("predict_form"):
             amount      = st.number_input("Transaction Amount ($)", min_value=0.01, value=4189.27, step=0.01)
             merchant_id = st.number_input("Merchant ID",            min_value=1,   value=688,     step=1)
@@ -695,7 +574,7 @@ elif page == "🔍  Transaction Analyzer":
             submitted   = st.form_submit_button("⚡  ANALYZE TRANSACTION", use_container_width=True)
 
     with col_result:
-        st.markdown("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;'>Prediction Result</div>", unsafe_allow_html=True)
+        html("<div style='font-size:0.74rem;color:#06B6D4;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;'>Prediction Result</div>")
         if submitted:
             with st.spinner("Scanning transaction..."):
                 result = predictor.predict_single(amount, merchant_id, tx_type, location, hour)
@@ -707,8 +586,8 @@ elif page == "🔍  Transaction Analyzer":
                     else "Transaction parameters align with normal activity. Safe to proceed."
             bg_gl = "rgba(239,68,68,0.06)" if is_fraud else "rgba(16,185,129,0.06)"
 
-            st.markdown(f"""
-            <div style="background:linear-gradient(160deg,{bg_gl},{{}});
+            html(f"""
+            <div style="background:linear-gradient(160deg,{bg_gl},rgba(5,13,26,0.9));
                         border:1px solid {col}40;border-radius:18px;padding:24px 22px;
                         box-shadow:0 0 40px {col}12;">
                 <div style="font-size:1.05rem;font-weight:800;color:{col};margin-bottom:16px;
@@ -734,9 +613,9 @@ elif page == "🔍  Transaction Analyzer":
                 </div>
                 <div style="font-size:0.74rem;color:#64748B;margin-top:10px;">{msg}</div>
             </div>
-            """.format("rgba(5,13,26,0.9)"), unsafe_allow_html=True)
+            """)
         else:
-            st.markdown("""
+            html("""
             <div style="background:rgba(10,22,40,0.7);border:1px dashed rgba(51,65,85,0.5);
                         border-radius:18px;padding:48px 20px;text-align:center;color:#475569;">
                 <div style="font-size:2.2rem;margin-bottom:14px;">🔍</div>
@@ -745,17 +624,16 @@ elif page == "🔍  Transaction Analyzer":
                     <strong style="color:#06B6D4;">ANALYZE TRANSACTION</strong>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
-
+            """)
 
 # ══════════════════════════════════════════════════════════════════════
-# UNIQUE FEATURE — PAGE: LIVE TRANSACTION MONITOR
+# PAGE: LIVE MONITOR
 # ══════════════════════════════════════════════════════════════════════
 elif page == "📡  Live Monitor":
     section_header("📡 Live Transaction Stream Monitor",
                    "Simulates real-time SOC feed — auto-analyzes random transactions from the dataset")
 
-    st.markdown("""
+    html("""
     <div style="background:linear-gradient(135deg,rgba(6,182,212,0.08),rgba(99,102,241,0.05));
                 border:1px solid rgba(6,182,212,0.2);border-radius:14px;padding:14px 18px;margin-bottom:20px;">
         <span style="font-size:0.8rem;color:#94A3B8;">
@@ -763,9 +641,8 @@ elif page == "📡  Live Monitor":
             Each scan runs the trained Random Forest model and displays probability scores instantly.
         </span>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
-    # Controls
     cc1, cc2, cc3 = st.columns([1, 1, 2])
     with cc1:
         n_scans = st.selectbox("Transactions to Scan", [5, 10, 20, 50], index=1)
@@ -777,7 +654,6 @@ elif page == "📡  Live Monitor":
     with cc3:
         run_scan = st.button("▶  START LIVE SCAN", use_container_width=True)
 
-    # Live feed placeholder
     feed_placeholder = st.empty()
     summary_placeholder = st.empty()
 
@@ -822,7 +698,6 @@ elif page == "📡  Live Monitor":
                 "risk": result['risk_level'],
             })
 
-            # Re-render full feed
             rows_html = ""
             for r in feed_rows:
                 rows_html += f"""
@@ -869,7 +744,6 @@ elif page == "📡  Live Monitor":
             """, unsafe_allow_html=True)
             time.sleep(delay)
 
-        # Summary
         genuine_count = n_scans - fraud_count
         summary_placeholder.markdown(f"""
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-top:18px;">
@@ -881,15 +755,14 @@ elif page == "📡  Live Monitor":
         """, unsafe_allow_html=True)
 
     else:
-        feed_placeholder.markdown("""
+        html("""
         <div style="background:rgba(10,22,40,0.8);border:1px dashed rgba(51,65,85,0.5);
                     border-radius:14px;padding:64px 20px;text-align:center;color:#475569;">
             <div style="font-size:2rem;margin-bottom:14px;">📡</div>
             <div style="font-size:0.88rem;">Click <strong style='color:#06B6D4;'>START LIVE SCAN</strong>
              to begin real-time transaction monitoring</div>
         </div>
-        """, unsafe_allow_html=True)
-
+        """)
 
 # ══════════════════════════════════════════════════════════════════════
 # PAGE: BATCH ANALYSIS
@@ -912,23 +785,22 @@ elif page == "📑  Batch Analysis":
 
     total  = len(bdf)
     frauds = len(bdf[bdf["Prediction"] == "FRAUDULENT"])
-    st.markdown(f"""
+    html(f"""
     <div style="display:flex;gap:14px;margin-top:14px;">
         {metric_pill("Showing", str(total), "#06B6D4")}
         {metric_pill("Flagged Fraud", str(frauds), "#EF4444")}
         {metric_pill("Confirmed Safe", str(total-frauds), "#10B981")}
     </div>
-    """, unsafe_allow_html=True)
-
+    """)
 
 # ══════════════════════════════════════════════════════════════════════
-# UNIQUE FEATURE — PAGE: INTELLIGENCE REPORT GENERATOR
+# PAGE: INTELLIGENCE REPORT
 # ══════════════════════════════════════════════════════════════════════
 elif page == "📥  Intelligence Report":
     section_header("📥 Fraud Intelligence Report Generator",
                    "Auto-generates a downloadable analytical report of the current session")
 
-    st.markdown("""
+    html("""
     <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(139,92,246,0.02));
                 border:1px solid rgba(139,92,246,0.25);border-radius:14px;padding:14px 18px;margin-bottom:24px;">
         <span style="font-size:0.82rem;color:#94A3B8;">
@@ -936,7 +808,7 @@ elif page == "📥  Intelligence Report":
             model performance, risk distribution, and key findings — ready to download and present.
         </span>
     </div>
-    """, unsafe_allow_html=True)
+    """)
 
     if st.button("📊  GENERATE INTELLIGENCE REPORT", use_container_width=True):
         with st.spinner("Compiling intelligence report..."):
@@ -1025,10 +897,8 @@ Model          : RandomForestClassifier (n_estimators=30, balanced)
         )
         st.success("✅ Report generated successfully! Click the download button above.")
 
-        # Preview
         with st.expander("📄 Preview Report", expanded=True):
             st.code(report, language=None)
-
 
 # ══════════════════════════════════════════════════════════════════════
 # PAGE: ABOUT & VIVA
@@ -1048,7 +918,7 @@ elif page == "ℹ️  About & Viva":
     ]
 
     for q, a in viva:
-        st.markdown(f"""
+        html(f"""
         <div style="background:linear-gradient(135deg,rgba(10,22,40,0.95),rgba(5,13,26,0.98));
                     border:1px solid rgba(51,65,85,0.5);border-radius:14px;
                     padding:16px 20px;margin-bottom:10px;
@@ -1056,16 +926,16 @@ elif page == "ℹ️  About & Viva":
             <div style="color:#06B6D4;font-weight:700;font-size:0.84rem;margin-bottom:7px;">{q}</div>
             <div style="color:#94A3B8;font-size:0.81rem;line-height:1.65;">{a}</div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
     st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
     tech = ["Python 3","Pandas","NumPy","Matplotlib","Scikit-learn","Random Forest","Joblib","Streamlit"]
     badges = " ".join([f'<span style="background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:#06B6D4;padding:4px 12px;border-radius:20px;font-size:0.73rem;font-weight:700;">{t}</span>' for t in tech])
-    st.markdown(f"""
+    html(f"""
     <div style="background:rgba(10,22,40,0.9);border:1px solid rgba(51,65,85,0.4);
                 border-radius:14px;padding:18px 22px;">
         <div style="color:#94A3B8;font-size:0.72rem;font-weight:700;text-transform:uppercase;
                     letter-spacing:0.5px;margin-bottom:12px;">Technology Stack</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">{badges}</div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
