@@ -431,8 +431,11 @@ elif page == "🔍  Transaction Analyzer":
             amount      = st.number_input("Transaction Amount ($)", min_value=0.01, value=4189.27, step=0.01)
             merchant_id = st.number_input("Merchant ID",            min_value=1,   value=688,     step=1)
             tx_type     = st.selectbox("Transaction Type", ["purchase","refund","transfer","withdrawal"], index=1)
-            location    = st.selectbox("Location", ["San Antonio","New York","Los Angeles","Chicago",
-                                                    "Houston","Phoenix","Philadelphia","San Diego","Dallas","San Jose"])
+            location    = st.selectbox("Location / Region", [
+                "India", "India (Mumbai)", "India (Delhi)", "India (Bengaluru)", "India (Hyderabad)",
+                "San Antonio", "New York", "Los Angeles", "Chicago",
+                "Houston", "Phoenix", "Philadelphia", "San Diego", "Dallas", "San Jose"
+            ])
             hour        = st.slider("Transaction Hour (0–23)", 0, 23, 3)
             submitted   = st.form_submit_button("⚡  ANALYZE TRANSACTION", use_container_width=True)
 

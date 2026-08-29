@@ -5,6 +5,7 @@ import numpy as np
 # Feature encoding mappings for deterministic transformation
 TRANSACTION_TYPES = ['purchase', 'refund', 'transfer', 'withdrawal']
 LOCATIONS = [
+    'India', 'India (Mumbai)', 'India (Delhi)', 'India (Bengaluru)', 'India (Hyderabad)',
     'San Antonio', 'New York', 'Los Angeles', 'Chicago', 'Houston',
     'Phoenix', 'Philadelphia', 'San Diego', 'Dallas', 'San Jose'
 ]
